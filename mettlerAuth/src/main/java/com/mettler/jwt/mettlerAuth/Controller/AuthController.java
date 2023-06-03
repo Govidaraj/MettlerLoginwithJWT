@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,6 @@ import com.mettler.jwt.mettlerAuth.Models.ERole;
 import com.mettler.jwt.mettlerAuth.Models.Role;
 import com.mettler.jwt.mettlerAuth.Models.User;
 import com.mettler.jwt.mettlerAuth.Security.jwt.JwtUtils;
-import com.mettler.jwt.mettlerAuth.Security.services.RoleService;
 import com.mettler.jwt.mettlerAuth.Security.services.UserDetailsImpl;
 import com.mettler.jwt.mettlerAuth.repository.RoleRepository;
 import com.mettler.jwt.mettlerAuth.repository.UserRepository;
@@ -54,13 +54,20 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
   
-  @Autowired
-  RoleService roleService;
-  
-  @PostMapping({"/createNewRole"})
-  public Role createNewRole(@RequestBody Role role) {
-      return roleService.createNewRole(role);
+  @PostMapping("/createNewRole")
+  public ResponseEntity<String> createNewRole(@RequestBody Role role) {
+      if (roleRepository.findByName(role.getName()).isPresent()) {
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role already exists: " + role.getName());
+      }
+
+      Role createdRole = roleRepository.save(role);
+      if (createdRole != null) {
+          return ResponseEntity.ok("Role created successfully");
+      } else {
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create role");
+      }
   }
+
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
