@@ -1,8 +1,12 @@
 package com.mettler.jwt.mettlerAuth.Controller;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mettler.jwt.mettlerAuth.Models.ERole;
 import com.mettler.jwt.mettlerAuth.Models.Role;
+import com.mettler.jwt.mettlerAuth.Models.Session;
 import com.mettler.jwt.mettlerAuth.Models.User;
 import com.mettler.jwt.mettlerAuth.Security.jwt.JwtUtils;
 import com.mettler.jwt.mettlerAuth.Security.services.UserDetailsImpl;
 import com.mettler.jwt.mettlerAuth.repository.RoleRepository;
+import com.mettler.jwt.mettlerAuth.repository.SessionRepository;
 import com.mettler.jwt.mettlerAuth.repository.UserRepository;
 import com.mettler.jwt.mettlerAuth.request.LoginRequest;
 import com.mettler.jwt.mettlerAuth.request.SignupRequest;
@@ -41,7 +47,10 @@ import jakarta.validation.Valid;
 public class AuthController {
   @Autowired
   AuthenticationManager authenticationManager;
-
+  
+  @Autowired
+  private SessionRepository sessionRepository;
+  
   @Autowired
   UserRepository userRepository;
 
@@ -74,6 +83,15 @@ public class AuthController {
 
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    
+    Session session = new Session();
+    session.setUsername(loginRequest.getUsername());
+    session.setSessionId(UUID.randomUUID().toString());
+    session.setCreatedDate(LocalDateTime.now());
+    Date jwtExpiration = new Date(System.currentTimeMillis() + jwtUtils.getJwtExpirationMs());
+    LocalDateTime expireTime = LocalDateTime.ofInstant(jwtExpiration.toInstant(), ZoneId.systemDefault());
+    session.setExpireTime(expireTime);
+    sessionRepository.save(session);
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -142,6 +160,7 @@ public class AuthController {
 
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
+
 
   @PostMapping("/signout")
   public ResponseEntity<?> logoutUser() {

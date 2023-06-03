@@ -7,9 +7,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-//Govind
+
 @Document(collection = "users")
 public class User {
     @Id
@@ -29,6 +30,25 @@ public class User {
     private String password;
 
     private Set<Role> roles = new HashSet<>();
+    
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
 
     public User() {
     }

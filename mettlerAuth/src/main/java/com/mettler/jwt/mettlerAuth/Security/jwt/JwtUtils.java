@@ -92,4 +92,9 @@ public class JwtUtils {
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
         .compact();
   }
+
+public long getJwtExpirationMs() {
+	
+	return jwtExpirationMs;
+}
 }
