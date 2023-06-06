@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mettler.jwt.mettlerAuth.Security.jwt.JwtUtils;
+import com.mettler.jwt.mettlerAuth.response.MessageResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 @CrossOrigin
 @RestController
@@ -26,7 +26,7 @@ public class TestController {
         if (authToken != null && jwtUtils.validateJwtToken(authToken)) {
             return ResponseEntity.ok("Welcome to Mettler Health Care....");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token expired");
+        	return ResponseEntity.badRequest().body(new MessageResponse("Invalid or expired token!"));
         }
     }
 }

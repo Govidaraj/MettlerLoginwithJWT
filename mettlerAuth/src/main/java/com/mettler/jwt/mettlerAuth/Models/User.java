@@ -33,6 +33,26 @@ public class User {
     
     private String resetToken;
     private LocalDateTime resetTokenExpiry;
+    
+    private String resetOtp;
+    private LocalDateTime resetOtpExpiration;
+    
+    
+    public String getResetOtp() {
+		return resetOtp;
+	}
+
+	public LocalDateTime getResetOtpExpiration() {
+		return resetOtpExpiration;
+	}
+
+	public void setResetOtp(String resetOtp) {
+        this.resetOtp = resetOtp;
+    }
+
+    public void setResetOtpExpiration(LocalDateTime resetOtpExpiration) {
+        this.resetOtpExpiration = resetOtpExpiration;
+    }
 
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
